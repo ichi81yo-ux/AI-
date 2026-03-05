@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>松本陽一｜学習チャット目次</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;900&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --paper: #f5f0e8;
+    --accent: #8b2e00;
+    --gold: #c9972a;
+    --muted: #7a6e5f;
+    --border: #c8bfaa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Serif JP', serif;
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 10% 20%, rgba(201,151,42,0.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, rgba(139,46,0,0.05) 0%, transparent 50%);
+  }
+
+  /* Grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 64px;
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 32px auto 0;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ink);
+    letter-spacing: 0.05em;
+  }
+
+  .header-desc {
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    line-height: 1.8;
+  }
+
+  /* Stats bar */
+  .stats {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    margin-bottom: 56px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Cards grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.6);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 28px 32px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--gold);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.3s ease;
+  }
+
+  .card:hover {
+    background: rgba(255,255,255,0.9);
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(26,18,8,0.1);
+  }
+
+  .card:hover::before {
+    transform: scaleY(1);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .card-num {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    background: rgba(122,110,95,0.1);
+    padding: 3px 8px;
+    border-radius: 1px;
+  }
+
+  /* Detail panel */
+  .detail-panel {
+    display: none;
+    margin-top: 20px;
+    grid-column: 1 / -1;
+    background: rgba(255,255,255,0.85);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--gold);
+    padding: 36px 40px;
+    animation: slideDown 0.3s ease;
+  }
+
+  .detail-panel.active {
+    display: block;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .detail-num {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .detail-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .detail-sections {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .detail-section h4 {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .detail-section ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .detail-section ul li {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.8;
+    padding-left: 12px;
+    position: relative;
+  }
+
+  .detail-section ul li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: 0.6rem;
+  }
+
+  .close-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    cursor: pointer;
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    transition: all 0.2s;
+    background: none;
+    font-family: inherit;
+  }
+
+  .close-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Active card state */
+  .card.selected {
+    background: rgba(255,255,255,0.95);
+    border-color: var(--gold);
+  }
+
+  .card.selected::before {
+    transform: scaleY(1);
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 64px;
+    text-align: center;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <p class="subtitle">Personal Knowledge Archive</p>
+    <h1>学習チャット<br>シリーズ目次</h1>
+    <p class="header-desc">よう｜福島県阿武隈高地<br>中級者向け構造化学習 / 2025–2026</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">10</div>
+      <div class="stat-label">完成カテゴリ</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">6</div>
+      <div class="stat-label">主要ドメイン</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">2026</div>
+      <div class="stat-label">最終更新</div>
+    </div>
+  </div>
+
+  <div class="grid" id="grid">
+
+    <div class="card" data-id="1" onclick="toggleCard(1)">
+      <div class="card-header">
+        <span class="card-num">No. 01</span>
+        <span class="card-title">経済学</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">金利・金融政策</span>
+        <span class="tag">インフレ</span>
+        <span class="tag">雇用・失業</span>
+      </div>
+    </div>
+
+    <div class="card" data-id="2" onclick="toggleCard(2)">
+      <div class="card-header">
+        <span class="card-num">No. 02</span>
+        <span class="card-title">気候変動と自然災害</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">温暖化</span>
+        <span class="tag">異常気象</span>
+        <span class="tag">防災</span>
+      </div>
+    </div>
+
+    <div class="card" data-id="3" onclick="toggleCard(3)">
+      <div class="card-header">
+        <span class="card-num">No. 03</span>
+        <span class="card-title">個人プロフィール</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">農業経営</span>
+        <span class="tag">福島・小野町</span>
+        <span class="tag">自律的経営</span>
+      </div>
+    </div>
+
+    <div class="card" data-id="4" onclick="toggleCard(4)">
+      <div class="card-header">
+        <span class="card-num">No. 04</span>
+        <span class="card-title">預言・スピリチュアル</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">占星術</span>
+        <span class="tag">タロット</span>
+        <span class="tag">東洋思想</span>
+      </div>
+    </div>
+
+    <div class="card" data-id="5" onclick="toggleCard(5)">
+      <div class="card-header">
+        <span class="card-num">No. 05</span>
+        <span class="card-title">国際情勢</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">露ウクライナ</span>
+        <span class="tag">中東</span>
+        <span class="tag">米中対立</span>
+      </div>
+    </div>
+
+    <div class="card" data-id="6" onclick="toggleCard(6)">
+      <div class="card-header">
+        <span class="card-num">No. 06</span>
+        <span class="card-title">グローバル社会問題</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">格差・貧困</span>
+        <span class="tag">AI・デジタル化</span>
+        <span class="tag">少子高齢化</span>
+      </div>
+    </div>
+
+    <div class="card" data-id="7" onclick="toggleCard(7)">
+      <div class="card-header">
+        <span class="card-num">No. 07</span>
+        <span class="card-title">日本</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">地理・農業</span>
+        <span class="tag">政治・経済</span>
+        <span class="tag">歴史・文化</span>
+      </div>
+    </div>
+
+    <div class="card" data-id="8" onclick="toggleCard(8)">
+      <div class="card-header">
+        <span class="card-num">No. 08</span>
+        <span class="card-title">太陽系</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">太陽活動</span>
+        <span class="tag">月・潮汐力</span>
+        <span class="tag">磁気圏</span>
+      </div>
+    </div>
+
+    <div class="card" data-id="9" onclick="toggleCard(9)">
+      <div class="card-header">
+        <span class="card-num">No. 09</span>
+        <span class="card-title">エプスタイン・権力エリート</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">ディープステート</span>
+        <span class="tag">権力構造</span>
+        <span class="tag">パワーエリート論</span>
+      </div>
+    </div>
+
+    <div class="card" data-id="10" onclick="toggleCard(10)">
+      <div class="card-header">
+        <span class="card-num">No. 10</span>
+        <span class="card-title">米国ダイナミクス・トランプ</span>
+      </div>
+      <div class="card-tags">
+        <span class="tag">第2期政権</span>
+        <span class="tag">関税・移民政策</span>
+        <span class="tag">テクノ寡頭</span>
+      </div>
+    </div>
+
+    <!-- Detail panel (injected here by JS) -->
+    <div class="detail-panel" id="detail-panel"></div>
+
+  </div>
+
+  <footer>
+    <p>よう 個人知識管理システム｜学習チャットシリーズ</p>
+  </footer>
+</div>
+
+<script>
+const data = {
+  1: {
+    title: '経済学',
+    sections: [
+      { heading: '金利・金融政策', items: ['中央銀行の役割と利上げ・利下げの仕組み', 'FRB・日銀・ECBの政策比較', '量的緩和（QE）と出口戦略'] },
+      { heading: 'インフレ・物価指数', items: ['CPI・PCEデフレーターの違い', 'コアインフレとヘッドラインの読み方', 'スタグフレーションのリスク'] },
+      { heading: '雇用・失業', items: ['非農業部門雇用統計の見方', '自然失業率とフィリップス曲線', 'グローバル経済との連動'] }
+    ]
+  },
+  2: {
+    title: '気候変動と自然災害',
+    sections: [
+      { heading: '温暖化メカニズム', items: ['温室効果ガスの種類と寄与度', 'IPCC報告書の要点', '気温1.5℃・2℃シナリオ'] },
+      { heading: '異常気象', items: ['ジェット気流の蛇行と極端現象', '台風・ハリケーンの強大化', '日本への具体的影響'] },
+      { heading: '防災・適応策', items: ['洪水・土砂災害リスク', '農業への影響と対策', '国際気候合意（パリ協定）'] }
+    ]
+  },
+  3: {
+    title: '個人プロフィール',
+    sections: [
+      { heading: '基本情報', items: ['氏名：よう', '所在：福島県阿武隈高地', '農地：約8反'] },
+      { heading: '農業経営', items: ['トラクター・重機・農機具所有', '自律的・自己主導型の経営', '多様なドメインへの知識展開'] },
+      { heading: '学習方針', items: ['番号制チャットシリーズで体系化', '複数AI（Claude・Gemini）活用', '定期的カテゴリ更新による知識維持'] }
+    ]
+  },
+  4: {
+    title: '預言・スピリチュアル',
+    sections: [
+      { heading: '日本・国際の預言者', items: ['国内スピリチュアル・霊能者', '海外予言者・チャネラー', '予言の検証と読み方'] },
+      { heading: '占星術・タロット', items: ['惑星配置と世界的事象の相関', 'タロットの大アルカナ体系', '個人鑑定と集合的読み方'] },
+      { heading: '東洋思想・霊的体験', items: ['易経・陰陽五行の基礎', '個人的な霊的体験の整理', 'スピリチュアリズムと科学の境界'] }
+    ]
+  },
+  5: {
+    title: '国際情勢',
+    sections: [
+      { heading: 'ロシア・ウクライナ', items: ['戦況の推移と和平交渉の現状', '欧州エネルギー安全保障', 'NATO拡大と安全保障秩序'] },
+      { heading: '中東情勢', items: ['イスラエル・ガザ紛争', 'イランの核・地域覇権', 'サウジ・湾岸の外交転換'] },
+      { heading: '米中対立・G7', items: ['台湾海峡リスクとデカップリング', 'AUKUS・クアッドの戦略', 'G7とグローバルサウスの動向'] }
+    ]
+  },
+  6: {
+    title: 'グローバル社会問題',
+    sections: [
+      { heading: '格差・貧困', items: ['ジニ係数と富の集中', '新興国の債務問題', '食料安全保障の危機'] },
+      { heading: 'デジタル化・AI', items: ['生成AI革命と労働市場', 'デジタル格差と途上国', 'AIガバナンスの国際競争'] },
+      { heading: '少子高齢化・移民', items: ['先進国共通の人口動態', '移民政策の政治化', 'エネルギー転換の課題'] }
+    ]
+  },
+  7: {
+    title: '日本',
+    sections: [
+      { heading: '地理・自然・農業', items: ['地形と農業適地の分布', '気候帯と作物生産', '食料自給率の課題'] },
+      { heading: '政治・経済', items: ['自民党政治の構造', '円安と日本経済の現状', '財政再建と社会保障'] },
+      { heading: '歴史・文化・地質', items: ['近現代史の要点', '文化的アイデンティティ', '南海トラフ・火山リスク'] }
+    ]
+  },
+  8: {
+    title: '太陽系',
+    sections: [
+      { heading: '太陽活動と地球', items: ['太陽周期（11年）と極大期', '太陽フレアと電磁インフラリスク', '宇宙天気予報の現状'] },
+      { heading: '月・潮汐力', items: ['月の引力と潮汐のメカニズム', '月と地殻変動の相関研究', '月周期と農業・生命体'] },
+      { heading: '磁気圏・惑星', items: ['地球磁気圏の防御構造', '磁極移動の現状と影響', '木星・土星の重力的相互作用'] }
+    ]
+  },
+  9: {
+    title: 'エプスタイン・権力エリート',
+    sections: [
+      { heading: '記録された事実', items: ['ジェフリー・エプスタインの実態', '人脈ネットワークの全容', '司法・政治への影響'] },
+      { heading: 'C.W.ミルズの権力エリート論', items: ['軍・政・財の「鉄の三角形」', '権力エリートの再生産構造', '民主主義との緊張関係'] },
+      { heading: 'ディープステート論', items: ['学術的定義と政治的利用の差異', '官僚機構の自律性問題', 'ポピュリズム運動との接点'] }
+    ]
+  },
+  10: {
+    title: '米国ダイナミクス・トランプ',
+    sections: [
+      { heading: '第2期政権の構造', items: ['内閣・側近の顔ぶれと特徴', 'MAGAコアと共和党主流派の緊張', '行政命令による迅速な政策転換'] },
+      { heading: '主要政策', items: ['関税・貿易保護主義の深化', '移民規制の強化と法的攻防', 'エネルギー規制緩和・パリ協定離脱'] },
+      { heading: 'テクノ寡頭・中間選挙', items: ['イーロン・マスク等の政治介入', 'テクノロジー資本との同盟と亀裂', '2026年中間選挙の行方'] }
+    ]
+  }
+};
+
+let activeCard = null;
+
+function toggleCard(id) {
+  const panel = document.getElementById('detail-panel');
+  const card = document.querySelector(`.card[data-id="${id}"]`);
+  const grid = document.getElementById('grid');
+
+  if (activeCard === id) {
+    // Close
+    panel.classList.remove('active');
+    card.classList.remove('selected');
+    activeCard = null;
+    return;
+  }
+
+  // Deselect previous
+  if (activeCard) {
+    document.querySelector(`.card[data-id="${activeCard}"]`).classList.remove('selected');
+  }
+
+  activeCard = id;
+  card.classList.add('selected');
+
+  const d = data[id];
+  const sectionsHtml = d.sections.map(s => `
+    <div class="detail-section">
+      <h4>${s.heading}</h4>
+      <ul>${s.items.map(i => `<li>${i}</li>`).join('')}</ul>
+    </div>
+  `).join('');
+
+  panel.innerHTML = `
+    <div class="detail-num">NO. ${String(id).padStart(2,'0')} — 学習カテゴリ詳細</div>
+    <div class="detail-title">${d.title}</div>
+    <div class="detail-sections">${sectionsHtml}</div>
+    <button class="close-btn" onclick="toggleCard(${id})">✕ 閉じる</button>
+  `;
+
+  // Move panel after clicked card
+  const cards = Array.from(grid.querySelectorAll('.card'));
+  const idx = cards.findIndex(c => c.dataset.id == id);
+  // Insert after the pair (every 2 cards)
+  const pairEnd = idx % 2 === 0 ? cards[idx + 1] : cards[idx];
+  if (pairEnd) {
+    pairEnd.after(panel);
+  } else {
+    card.after(panel);
+  }
+
+  panel.classList.add('active');
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
+</script>
+</body>
+</html>
